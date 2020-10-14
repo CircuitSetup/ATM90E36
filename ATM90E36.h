@@ -5,7 +5,7 @@
 
 #define WRITE 0 // WRITE SPI
 #define READ 1 	// READ SPI
-#define DEBUG_SERIAL
+#define DEBUG_SERIAL 1
 
 /* STATUS REGISTERS */
 #define SoftReset 0x00 		// Software Reset
@@ -189,7 +189,7 @@
 #define UrmsA 0xD9 			// A RMS Voltage
 #define UrmsB 0xDA 			// B RMS Voltage
 #define UrmsC 0xDB 			// C RMS Voltage
-#define IrmsN0 0xDC 		// N Calculated Current (USE)
+#define IrmsN0 0xDC 		// N Calculated Current
 #define IrmsA 0xDD 			// A RMS Current
 #define IrmsB 0xDE 			// B RMS Current
 #define IrmsC 0xDF 			// C RMS Current
@@ -228,16 +228,28 @@
 #define UangleB 0xFE		// B Voltage Phase Angle
 #define UangleC 0xFF		// C Voltage Phase Angle
 
-	class ATM90E36
+class ATM90E36
 	{
-	private:
-		int _energy_CS;		
+	private:	
 		unsigned short CommEnergyIC(unsigned char RW, unsigned short address, unsigned short val);
+		int _energy_CS;
+		unsigned short _lineFreq;
+		unsigned short _pgagain;
+		unsigned short _ugain;
+		unsigned short _igainA;
+		unsigned short _igainB;
+		unsigned short _igainC;
+		unsigned short _igainN;
+		int Read32Register(signed short regh_addr, signed short regl_addr);
 	public:
-		ATM90E36(int pin);
+		/* Construct */
+		ATM90E36(void);
+		/* Destruct */
+		~ATM90E36(void);
 
 		/* Initialization Functions */	
-		void begin();
+		void begin(int pin, unsigned short lineFreq, unsigned short pgagain, unsigned short ugain, unsigned short igainA, unsigned short igainB, unsigned short igainC, unsigned short igainN);
+		uint16_t checkSum(int start, int end);
 		
 		/* Main Electrical Parameters (GET)*/
 		double GetLineVoltageA();
@@ -248,6 +260,7 @@
 		double GetLineCurrentB();
 		double GetLineCurrentC();
 		double GetLineCurrentN();
+		double GetCalcLineCurrentN();
 
 		double GetActivePowerA();
 		double GetActivePowerB();
@@ -270,6 +283,14 @@
 		double GetPowerFactorB();
 		double GetPowerFactorC();
 		double GetTotalPowerFactor();
+		
+		double GetVHarmA();
+		double GetVHarmB();
+		double GetVHarmC();
+		
+		double GetCHarmA();
+		double GetCHarmB();
+		double GetCHarmC();
 
 		double GetPhaseA();
 		double GetPhaseB();
